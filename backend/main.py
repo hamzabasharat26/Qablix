@@ -7,12 +7,11 @@ from typing import Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
-import google.generativeai as genai
+from google import genai
 
 from database import engine, get_db, Base
 from models import User, CheckIn, HabitLog
@@ -20,7 +19,7 @@ from models import User, CheckIn, HabitLog
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 Base.metadata.create_all(bind=engine)
 
@@ -167,11 +166,14 @@ You MUST respond ONLY with valid JSON in this exact format:
 Do not include any markdown formatting, code fences, or extra text. Return ONLY the JSON object."""
 
     try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt,
+        )
         raw_text = response.text
         guidance = clean_gemini_json(raw_text)
     except Exception as e:
+        print(f"[GEMINI ERROR] {type(e).__name__}: {e}")
         guidance = {
             "detected_mood": mood_to_use if not inferred else "Calm",
             "emotion_analysis": "We could not process your request at this time. Please try again.",
