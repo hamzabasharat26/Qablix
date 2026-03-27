@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import time
 from datetime import date, datetime
 from typing import Optional
 
@@ -165,15 +166,38 @@ You MUST respond ONLY with valid JSON in this exact format:
 
 Do not include any markdown formatting, code fences, or extra text. Return ONLY the JSON object."""
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
-        )
-        raw_text = response.text
-        guidance = clean_gemini_json(raw_text)
-    except Exception as e:
-        print(f"[GEMINI ERROR] {type(e).__name__}: {e}")
+    # ── Retry with backoff + model fallback ──
+    MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
+    guidance = None
+
+    for model_name in MODELS:
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                raw_text = response.text
+                guidance = clean_gemini_json(raw_text)
+                print(f"[GEMINI] Success with {model_name} on attempt {attempt+1}")
+                break  # Success
+            except Exception as e:
+                err_str = str(e)
+                print(f"[GEMINI] {model_name} attempt {attempt+1} failed: {type(e).__name__}: {err_str[:200]}")
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    wait = (attempt + 1) * 3  # 3s, 6s, 9s
+                    print(f"[GEMINI] Rate limited. Waiting {wait}s before retry...")
+                    time.sleep(wait)
+                elif "leaked" in err_str.lower() or "PERMISSION_DENIED" in err_str:
+                    print("[GEMINI] API key is invalid or flagged. Skipping all retries.")
+                    break
+                else:
+                    break  # Non-retryable error, try next model
+        if guidance:
+            break  # Got a successful response
+
+    if not guidance:
+        print("[GEMINI] All models/retries exhausted. Using fallback.")
         guidance = {
             "detected_mood": mood_to_use if not inferred else "Calm",
             "emotion_analysis": "We could not process your request at this time. Please try again.",
