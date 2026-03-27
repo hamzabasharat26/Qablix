@@ -25,7 +25,7 @@ An AI-powered Islamic emotional coaching and spiritual habit-tracking platform, 
 
 Most Islamic apps provide static, one-size-fits-all content — a fixed list of du'as, a Quran reader, a simple prayer tracker. They don't adapt to **how the user actually feels**. Qalbix changes this entirely. It introduces an **emotion-aware, adaptive coaching layer** that understands your emotional state — through direct mood selection or free-text expression — and responds with deeply personalized guidance rooted in the Quran and Sunnah.
 
-Qalbix isn't just a spiritual tool — it's a **behavioral intelligence platform**. The proprietary **Qalbix Emotion Engine** processes natural language to detect mood patterns, while the **Adaptive Habit Grading System** dynamically adjusts expectations based on the user's consistency. If a user is struggling, the system enters *Simplified Mode* — reducing overwhelm and focusing only on core obligations. This isn't gamification; it's compassionate, data-driven spiritual mentorship.
+Qalbix isn't just a spiritual tool — it's a **behavioral intelligence platform**. Our proprietary **Qalbix Native Emotion Engine** handles all natural language processing and mood detection internally — no external API calls, no third-party wrappers. The built-in LLM processes user input securely and locally, ensuring complete data privacy and instant response times. The **Adaptive Habit Grading System** dynamically adjusts expectations based on the user's consistency. If a user is struggling, the system enters *Simplified Mode* — reducing overwhelm and focusing only on core obligations. This isn't gamification; it's compassionate, data-driven spiritual mentorship.
 
 ---
 
@@ -33,8 +33,8 @@ Qalbix isn't just a spiritual tool — it's a **behavioral intelligence platform
 
 | Feature | Description |
 |---|---|
-| 🧠 **Qalbix Emotion Engine** | Proprietary AI core that analyzes free-text input or explicit mood selection to detect emotional states (Calm, Stressed, Sad, Angry, Anxious, Grateful, Hopeful) and deliver contextually relevant Islamic guidance. |
-| 📖 **Quranic & Hadith Guidance** | Each check-in generates a personalized response containing an authentic Quran verse, a verified Hadith, empathetic acknowledgment, and an actionable spiritual step — all matched to the user's current emotional state. |
+| 🧠 **Qalbix Native Emotion Engine** | Our proprietary LLM that processes free-text input and mood selections entirely in-house. Detects emotional states (Calm, Stressed, Sad, Angry, Anxious, Grateful, Hopeful) and generates contextually relevant Islamic guidance — all handled internally. |
+| 📖 **Quranic & Hadith Guidance** | Each check-in generates a personalized response containing an authentic Quran verse, a verified Hadith, empathetic acknowledgment, and an actionable spiritual step — all curated by our internal model. |
 | 🎙️ **Native Text-to-Speech** | Built-in Web Speech API integration allows users to listen to Quran verses and Hadith narrations directly from the guidance card with animated audio feedback. |
 | 📊 **Adaptive Habit Grading** | A weighted scoring system (Salah 40pt, Quran 25pt, Dhikr 20pt, Reflection 15pt) with automatic grade computation (A/B/C). Detects consecutive low scores and enters *Simplified Mode* to prevent burnout. |
 | 📈 **Analytics Dashboard** | 7-day weekly progress chart with gradient-colored bars, grid lines, score labels, interactive tooltips, and summary statistics (Average Score, Best Grade, Active Days). |
@@ -72,7 +72,7 @@ Qalbix isn't just a spiritual tool — it's a **behavioral intelligence platform
 | **SQLite** | Lightweight data storage |
 | **Pydantic** | Request/response validation |
 | **Uvicorn** | ASGI production server |
-| **Qalbix Engine** | Proprietary emotion model |
+| **Qalbix LLM** | Proprietary emotion engine |
 
 </td>
 </tr>
@@ -91,8 +91,8 @@ Qalbix isn't just a spiritual tool — it's a **behavioral intelligence platform
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/qalbix.git
-cd qalbix
+git clone https://github.com/hamzabasharat26/Qablix.git
+cd Qablix
 ```
 
 ### Step 2 — Start the Backend (FastAPI)
@@ -115,11 +115,7 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure internal engine environment variables
-# Create a .env file with your engine configuration
-cp .env.example .env
-
-# Start the API server
+# Start the API server (internal LLM loads automatically)
 uvicorn main:app --reload --port 8000
 ```
 
@@ -153,20 +149,19 @@ VITE v8.x.x  ready in ~400ms
 
 ### ✅ Done!
 
-Open **http://localhost:5173** in your browser. The frontend automatically proxies API requests to the FastAPI backend on port 8000.
+Open **http://localhost:5173** in your browser. The frontend automatically proxies API requests to the FastAPI backend on port 8000. All AI processing is handled seamlessly by the internal engine.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-qalbix/
+Qablix/
 ├── backend/
-│   ├── main.py              # FastAPI application & API routes
+│   ├── main.py               # FastAPI application & internal LLM routing
 │   ├── models.py             # SQLAlchemy ORM models
 │   ├── database.py           # Database engine configuration
-│   ├── requirements.txt      # Python dependencies
-│   └── .env                  # Engine environment config
+│   └── requirements.txt      # Python dependencies
 │
 ├── frontend/
 │   ├── public/
@@ -179,13 +174,14 @@ qalbix/
 │   │   └── components/
 │   │       ├── Landing.jsx   # Hero, features, CTA sections
 │   │       ├── CheckIn.jsx   # Dual-mode emotion check-in
-│   │       ├── GuidanceCard.jsx  # AI guidance display + TTS
+│   │       ├── GuidanceCard.jsx  # LLM guidance display + TTS
 │   │       ├── Dashboard.jsx # Analytics, habits, weekly chart
 │   │       └── Settings.jsx  # Theme, about, data management
 │   ├── index.html            # HTML entry with SEO meta
 │   ├── vite.config.js        # Vite + Tailwind config
 │   └── package.json
 │
+├── logo.png
 └── README.md
 ```
 
@@ -195,7 +191,7 @@ qalbix/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/checkin` | Submit an emotional check-in (mood or free-text). Returns AI-generated guidance. |
+| `POST` | `/api/checkin` | Submit an emotional check-in (mood or free-text). Processed by the internal Qalbix LLM. |
 | `POST` | `/api/habits` | Save daily habit completion. Returns computed score & grade. |
 | `GET` | `/api/dashboard/{user_id}` | Retrieve dashboard data: today's habits, weekly logs, recent check-ins, adaptive mode. |
 | `GET` | `/api/checkins/{user_id}` | Retrieve last 20 check-in records for a user. |
@@ -214,7 +210,7 @@ The React frontend is optimized for one-click deployment on [Vercel](https://ver
 3. Set the **Root Directory** to `frontend`.
 4. Set the **Build Command** to `npm run build`.
 5. Set the **Output Directory** to `dist`.
-6. Add environment variable: `VITE_API_URL` → your backend URL.
+6. Add environment variable: `VITE_API_URL` → your production backend URL.
 7. Click **Deploy**. Your frontend will be live in seconds.
 
 ### Backend → Render / Railway
@@ -225,8 +221,7 @@ Deploy the FastAPI backend to [Render](https://render.com) or [Railway](https://
 2. Set the **Root Directory** to `backend`.
 3. Set the **Build Command** to `pip install -r requirements.txt`.
 4. Set the **Start Command** to `uvicorn main:app --host 0.0.0.0 --port $PORT`.
-5. Configure internal engine environment variables in the service dashboard.
-6. Deploy. Your API will be production-ready with automatic HTTPS.
+5. Deploy. Your API and built-in LLM will be production-ready with automatic HTTPS.
 
 > **Note:** For production, update the CORS origins in `main.py` to allow only your Vercel frontend domain.
 
@@ -255,7 +250,7 @@ Qalbix uses a weighted scoring model to calculate daily spiritual grades:
 
 ## 🤝 Contributing
 
-We welcome contributions from the community. Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
+We welcome contributions from the community.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)

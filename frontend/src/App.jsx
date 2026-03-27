@@ -52,7 +52,6 @@ function Navbar({ dark, setDark }) {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <NavLink to="/" className="flex items-center gap-2.5 shrink-0">
             <img src="/logo.png" alt="Qalbix" className="h-8 w-8 object-contain" />
             <span className={`text-lg font-bold tracking-tight ${dark ? 'text-white' : 'text-slate-900'}`}
@@ -61,7 +60,6 @@ function Navbar({ dark, setDark }) {
             </span>
           </NavLink>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map(({ to, label, Icon }) => (
               <NavLink key={to} to={to} end={to === '/'}>
@@ -80,37 +78,24 @@ function Navbar({ dark, setDark }) {
             ))}
           </nav>
 
-          {/* Right */}
           <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setDark(!dark)}
+            <button onClick={() => setDark(!dark)}
               className={`p-2 rounded-lg transition-colors ${dark ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
-              aria-label="Toggle theme"
-            >
+              aria-label="Toggle theme">
               {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-
-            {/* Mobile toggle */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className={`md:hidden p-2 rounded-lg transition-colors ${dark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
-            >
+            <button onClick={() => setMobileOpen(!mobileOpen)}
+              className={`md:hidden p-2 rounded-lg transition-colors ${dark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Nav */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className={`md:hidden overflow-hidden border-t ${dark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
-          >
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className={`md:hidden overflow-hidden border-t ${dark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
             <div className="px-4 py-3 space-y-1">
               {NAV_LINKS.map(({ to, label, Icon }) => (
                 <NavLink key={to} to={to} end={to === '/'}>

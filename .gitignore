@@ -1,0 +1,29 @@
+# Dependencies
+frontend/node_modules/
+backend/__pycache__/
+backend/venv/
+
+# Environment & secrets
+backend/.env
+backend/.env.example
+
+# Database
+backend/*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+frontend/dist/
+frontend/.vite/
+frontend/node_modules/.vite/
+
+# Logs
+*.log
+npm-debug.log*
